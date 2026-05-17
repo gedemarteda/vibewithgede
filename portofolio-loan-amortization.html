@@ -159,11 +159,6 @@
   .la-divider { border: none; border-top: 1px solid #e5e5e0; margin: 2rem 0; }
 
   /* ── MINI STATS ── */
-  .la-mini-stats { display: flex; flex-direction: column; gap: 0.9rem; }
-  .la-mini-stat { display: flex; justify-content: space-between; align-items: baseline; }
-  .la-mini-label { font-size: 0.75rem; color: #999; font-weight: 500; }
-  .la-mini-value { font-size: 0.95rem; font-weight: 700; color: #1c1c1c; letter-spacing: -0.01em; }
-  .la-mini-value.accent { color: #2a7a50; }
 
   /* ── RIGHT PANEL ── */
   .la-result-label {
@@ -416,28 +411,6 @@
     <!-- Error banner -->
     <div class="la-error-banner hidden" id="error-banner"></div>
 
-    <!-- Mini summary -->
-    <div id="left-summary" class="hidden">
-      <hr class="la-divider" />
-      <div class="la-mini-stats">
-        <div class="la-mini-stat">
-          <span class="la-mini-label" id="mini-angsuran-label">Angsuran / Bulan</span>
-          <span class="la-mini-value accent" id="mini-angsuran">—</span>
-        </div>
-        <div class="la-mini-stat">
-          <span class="la-mini-label">Total Bunga</span>
-          <span class="la-mini-value" id="mini-bunga">—</span>
-        </div>
-        <div class="la-mini-stat">
-          <span class="la-mini-label">Total Pengembalian</span>
-          <span class="la-mini-value" id="mini-total">—</span>
-        </div>
-        <div class="la-mini-stat">
-          <span class="la-mini-label">Estimasi Lunas</span>
-          <span class="la-mini-value" id="mini-lunas">—</span>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- ── RIGHT: RESULTS ── -->
@@ -725,7 +698,6 @@ const inpRate   = document.getElementById("inp-rate");
 const inpTenor  = document.getElementById("inp-tenor");
 const inpMethod = document.getElementById("inp-method");
 const errBanner = document.getElementById("error-banner");
-const leftSum   = document.getElementById("left-summary");
 const emptyEl   = document.getElementById("empty-state");
 const resultsEl = document.getElementById("results");
 
@@ -759,7 +731,6 @@ function recalc() {
     errBanner.classList.add("hidden");
     emptyEl.classList.remove("hidden");
     resultsEl.classList.add("hidden");
-    leftSum.classList.add("hidden");
     currentSchedule = null;
     return;
   }
@@ -779,7 +750,6 @@ function recalc() {
     errBanner.classList.remove("hidden");
     emptyEl.classList.remove("hidden");
     resultsEl.classList.add("hidden");
-    leftSum.classList.add("hidden");
     currentSchedule = null;
     return;
   }
@@ -794,15 +764,6 @@ function recalc() {
   const principalPct = (schedule.totalPrincipal / schedule.totalRepayment) * 100;
   const interestPct  = 100 - principalPct;
   const lunas        = payoffDate(tenor);
-
-  // ── LEFT MINI STATS ──
-  const angsuranLabel = schedule.angsuranVaries ? "Angsuran Bln 1 (tertinggi)" : "Angsuran Tetap / Bulan";
-  document.getElementById("mini-angsuran-label").textContent = angsuranLabel;
-  document.getElementById("mini-angsuran").textContent = `Rp ${formatIDR(schedule.fixedPayment)}`;
-  document.getElementById("mini-bunga").textContent    = `Rp ${formatIDR(schedule.totalInterest)}`;
-  document.getElementById("mini-total").textContent    = `Rp ${formatIDR(schedule.totalRepayment)}`;
-  document.getElementById("mini-lunas").textContent    = lunas;
-  leftSum.classList.remove("hidden");
 
   // ── HERO ──
   document.getElementById("hero-num").textContent = `Rp ${formatIDR(schedule.totalRepayment)}`;
