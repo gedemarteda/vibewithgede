@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kalkulator Kredit Angsuran - VWG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #f6f6f3;
+    min-height: 100vh;
+    color: #1c1c1c;
+  }
+
+  /* ── PAGE SHELL ── */
+  .la-page {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 3rem 2rem 5rem;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+  @media (max-width: 860px) {
+    .la-page { grid-template-columns: 1fr; gap: 2.5rem; }
+  }
+
+  /* ── LEFT PANEL ── */
+  .la-heading {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.85rem;
+    font-weight: 400;
+    line-height: 1.22;
+    letter-spacing: -0.025em;
+    color: #1c1c1c;
+    margin-bottom: 0.6rem;
+  }
+  .la-subheading {
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.65;
+    margin-bottom: 2.25rem;
+  }
+
+  /* ── FIELDS ── */
+  .la-field { margin-bottom: 1.6rem; }
+  .la-label {
+    display: block;
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 0.45rem;
+  }
+  .la-input-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1.5px solid #d0d0cb;
+    padding-bottom: 0.35rem;
+    transition: border-color 0.18s;
+  }
+  .la-input-row:focus-within { border-color: #2a7a50; }
+  .la-affix { font-size: 1rem; color: #aaa; flex-shrink: 0; }
+  .la-affix.pre { margin-right: 0.3rem; }
+  .la-affix.suf { margin-left: 0.3rem; }
+  .la-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: #1c1c1c;
+    min-width: 0;
+  }
+  .la-input::placeholder { color: #c5c5be; }
+  .la-input[type=number]::-webkit-inner-spin-button,
+  .la-input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  /* ── METHOD DROPDOWN ── */
+  .la-select-wrap {
+    position: relative;
+    border-bottom: 1.5px solid #d0d0cb;
+    padding-bottom: 0.35rem;
+    transition: border-color 0.18s;
+  }
+  .la-select-wrap:focus-within { border-color: #2a7a50; }
+  .la-select {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: #1c1c1c;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 1.5rem;
+  }
+  .la-select-chevron {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #aaa;
+    font-size: 0.75rem;
+  }
+
+  /* ── METHOD BADGE ── */
+  .la-method-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.18rem 0.65rem;
+    border-radius: 99px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .badge-anuitas  { background: #eef6f1; color: #2a7a50; }
+  .badge-efektif  { background: #eef3fb; color: #2c5f9a; }
+  .badge-flat     { background: #fef4eb; color: #b06020; }
+
+  /* ── METHOD INFO BOX ── */
+  .la-method-info {
+    font-size: 0.78rem;
+    color: #666;
+    line-height: 1.55;
+    background: #f0f0ec;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-top: 0.5rem;
+  }
+
+  /* ── ERROR BANNER ── */
+  .la-error-banner {
+    background: #fff5f5;
+    border: 1px solid #fcc;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.82rem;
+    color: #c0392b;
+    line-height: 1.6;
+  }
+
+  /* ── DIVIDER ── */
+  .la-divider { border: none; border-top: 1px solid #e5e5e0; margin: 2rem 0; }
+
+  /* ── MINI STATS ── */
+  .la-mini-stats { display: flex; flex-direction: column; gap: 0.9rem; }
+  .la-mini-stat { display: flex; justify-content: space-between; align-items: baseline; }
+  .la-mini-label { font-size: 0.75rem; color: #999; font-weight: 500; }
+  .la-mini-value { font-size: 0.95rem; font-weight: 700; color: #1c1c1c; letter-spacing: -0.01em; }
+  .la-mini-value.accent { color: #2a7a50; }
+
+  /* ── RIGHT PANEL ── */
+  .la-result-label {
+    font-size: 0.67rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 0.4rem;
+  }
+  .la-big-num {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    color: #1c1c1c;
+    line-height: 1.1;
+    margin-bottom: 1.2rem;
+    overflow-wrap: break-word;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .la-bar-track {
+    height: 6px;
+    border-radius: 99px;
+    background: #e0e0da;
+    overflow: hidden;
+    margin-bottom: 0.45rem;
+  }
+  .la-bar-fill {
+    height: 100%;
+    background: #2a7a50;
+    border-radius: 99px;
+    transition: width 0.5s ease;
+  }
+  .la-bar-labels {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 1.75rem;
+  }
+
+  /* ── STAT GRID ── */
+  .la-statgrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(min-content, 1fr));
+    border-top: 1px solid #e0e0da;
+    border-left: 1px solid #e0e0da;
+    margin-bottom: 2rem;
+  }
+  @media (max-width: 480px) {
+    .la-statgrid { grid-template-columns: repeat(2, minmax(min-content, 1fr)); }
+  }
+  .la-statcell {
+    padding: 0.9rem 1.1rem;
+    border-right: 1px solid #e0e0da;
+    border-bottom: 1px solid #e0e0da;
+  }
+  .la-statlabel {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 0.3rem;
+  }
+  .la-statvalue { font-size: 1.05rem; font-weight: 600; color: #1c1c1c; letter-spacing: -0.02em; white-space: nowrap; line-height: 1.3; }
+
+  /* ── SECTION HEADER ── */
+  .la-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .la-section-left { display: flex; align-items: center; gap: 0.6rem; }
+  .la-section-title { font-size: 0.82rem; font-weight: 700; color: #1c1c1c; letter-spacing: -0.01em; }
+  .la-section-right { display: flex; align-items: center; gap: 0.6rem; }
+  .la-section-badge {
+    font-size: 0.7rem; color: #888; background: #ececea;
+    border-radius: 99px; padding: 0.15rem 0.6rem; font-weight: 500;
+  }
+
+  /* ── DOWNLOAD BUTTON ── */
+  .la-dl-btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: #2a7a50; color: #fff; border: none; border-radius: 6px;
+    padding: 0.35rem 0.85rem; font-size: 0.75rem; font-weight: 600;
+    font-family: inherit; cursor: pointer; transition: background 0.18s; letter-spacing: 0.01em;
+  }
+  .la-dl-btn:hover { background: #205f3d; }
+
+  /* ── TABLE ── */
+  .la-table-wrap { overflow-x: auto; }
+  .la-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 680px; }
+  .la-table th {
+    text-align: right; font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; color: #999;
+    padding: 0 0.75rem 0.65rem; border-bottom: 1.5px solid #e0e0da;
+  }
+  .la-table th:first-child { text-align: center; }
+  .la-table th:nth-child(3) { text-align: center; }
+  .la-table td {
+    text-align: right; padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid #f0f0eb; color: #333; vertical-align: middle;
+  }
+  .la-table td:first-child { text-align: center; }
+  .la-table td:nth-child(3) { text-align: center; }
+  .la-table tbody tr:hover td { background: #f9f9f6; }
+  .la-table tfoot { display: none; } /* replaced by .la-tfoot-summary below */
+
+  /* ── TOTAL SUMMARY BLOCK (replaces tfoot) ── */
+  .la-tfoot-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1.5px solid #e0e0da;
+    border-top: 2.5px solid #2a7a50;
+    border-radius: 0 0 8px 8px;
+    background: #f6f6f3;
+    margin-top: -1px;
+    overflow: hidden;
+  }
+  .la-tfoot-cell {
+    padding: 0.85rem 1rem;
+    border-right: 1px solid #e0e0da;
+  }
+  .la-tfoot-cell:last-child { border-right: none; }
+  .la-tfoot-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 0.3rem;
+  }
+  .la-tfoot-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1c1c1c;
+    letter-spacing: -0.02em;
+    overflow-wrap: break-word;
+    line-height: 1.25;
+  }
+  .la-tfoot-value.green { color: #2a7a50; }
+  .la-tfoot-value.orange { color: #c0692a; }
+
+  .la-month-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 28px; height: 28px; border-radius: 99px; padding: 0 5px;
+    background: #eef6f1; color: #2a7a50; font-weight: 700; font-size: 0.72rem;
+  }
+  .la-last .la-month-badge { background: #2a7a50; color: #fff; }
+  .la-rate-pill {
+    display: inline-block; background: #fef9ec; color: #b07d1a;
+    border: 1px solid #f0dfa0; border-radius: 99px;
+    padding: 0.1rem 0.5rem; font-size: 0.7rem; font-weight: 600;
+  }
+  .la-interest-val { color: #c0692a; }
+  .la-angsuran-val { color: #2a7a50; font-weight: 600; }
+  .la-zero { color: #2a7a50; font-weight: 700; }
+
+  /* ── ANGSURAN VARIES NOTE ── */
+  .la-varies-note {
+    font-size: 0.72rem; color: #888; font-style: italic; margin-left: 4px;
+  }
+
+  /* ── EMPTY STATE ── */
+  .la-empty { color: #bbb; font-size: 0.875rem; padding-top: 2rem; }
+  .la-empty-arrow { font-size: 2rem; margin-bottom: 0.5rem; }
+  @media (max-width: 860px) { .la-empty-arrow { display: none; } }
+
+  /* ── WATERMARK ── */
+  .la-watermark {
+    text-align: center;
+    padding: 2rem 0 1.5rem;
+    font-size: 0.72rem;
+    color: #bbb;
+    letter-spacing: 0.04em;
+  }
+  .la-watermark a {
+    color: #2a7a50;
+    font-weight: 600;
+    text-decoration: none;
+    opacity: 0.7;
+  }
+  .la-watermark a:hover { opacity: 1; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+
+<body>
+<div class="la-page">
+
+  <!-- ── LEFT: INPUTS ── -->
+  <div class="la-left">
+    <h1 class="la-heading">Kalkulator Kredit<br>Angsuran</h1>
+    <p class="la-subheading">
+      Hitung jadwal angsuran dengan tiga metode berbeda. Sesuaikan pinjaman, tenor, dan suku bunga secara real-time.
+    </p>
+
+    <!-- Method dropdown -->
+    <div class="la-field">
+      <label class="la-label" for="inp-method">Metode Perhitungan</label>
+      <div class="la-select-wrap">
+        <select class="la-select" id="inp-method">
+          <option value="anuitas">Anuitas — Angsuran tetap setiap bulan</option>
+          <option value="efektif">Efektif — Pokok tetap, bunga menurun</option>
+          <option value="flat">Flat — Pokok &amp; bunga tetap (simple)</option>
+        </select>
+        <span class="la-select-chevron">▾</span>
+      </div>
+      <div class="la-method-info" id="method-info">
+        Angsuran total sama setiap bulan. Porsi bunga menurun, porsi pokok meningkat seiring saldo berkurang.
+      </div>
+    </div>
+
+    <!-- Loan amount -->
+    <div class="la-field">
+      <label class="la-label" for="inp-loan">Jumlah Pinjaman</label>
+      <div class="la-input-row">
+        <span class="la-affix pre">Rp</span>
+        <input class="la-input" id="inp-loan" placeholder="10.000.000" autocomplete="off" />
+      </div>
+    </div>
+
+    <!-- Interest rate -->
+    <div class="la-field">
+      <label class="la-label" for="inp-rate">Suku Bunga per Bulan</label>
+      <div class="la-input-row">
+        <input class="la-input" id="inp-rate" type="text" inputmode="decimal" placeholder="1" autocomplete="off" />
+        <span class="la-affix suf">%</span>
+      </div>
+    </div>
+
+    <!-- Tenor -->
+    <div class="la-field">
+      <label class="la-label" for="inp-tenor">Tenor</label>
+      <div class="la-input-row">
+        <input class="la-input" id="inp-tenor" type="number" placeholder="24" min="1" max="360" step="1" />
+        <span class="la-affix suf">bulan</span>
+      </div>
+    </div>
+
+    <!-- Error banner -->
+    <div class="la-error-banner hidden" id="error-banner"></div>
+
+    <!-- Mini summary -->
+    <div id="left-summary" class="hidden">
+      <hr class="la-divider" />
+      <div class="la-mini-stats">
+        <div class="la-mini-stat">
+          <span class="la-mini-label" id="mini-angsuran-label">Angsuran / Bulan</span>
+          <span class="la-mini-value accent" id="mini-angsuran">—</span>
+        </div>
+        <div class="la-mini-stat">
+          <span class="la-mini-label">Total Bunga</span>
+          <span class="la-mini-value" id="mini-bunga">—</span>
+        </div>
+        <div class="la-mini-stat">
+          <span class="la-mini-label">Total Pengembalian</span>
+          <span class="la-mini-value" id="mini-total">—</span>
+        </div>
+        <div class="la-mini-stat">
+          <span class="la-mini-label">Estimasi Lunas</span>
+          <span class="la-mini-value" id="mini-lunas">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: RESULTS ── -->
+  <div class="la-right">
+
+    <!-- Empty state -->
+    <div class="la-empty" id="empty-state">
+      <div class="la-empty-arrow">←</div>
+      Isi form di kiri untuk melihat jadwal angsuran.
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="hidden">
+
+      <!-- Hero -->
+      <div class="la-result-label">Total Pokok + Bunga</div>
+      <div class="la-big-num" id="hero-num">—</div>
+
+      <!-- Progress bar -->
+      <div class="la-bar-track">
+        <div class="la-bar-fill" id="bar-fill" style="width:80%"></div>
+      </div>
+      <div class="la-bar-labels">
+        <span id="bar-lbl-pokok">Pokok — 80%</span>
+        <span id="bar-lbl-bunga">Bunga — 20%</span>
+      </div>
+
+      <!-- Stat grid -->
+      <div class="la-statgrid">
+        <div class="la-statcell">
+          <div class="la-statlabel">Suku Bunga</div>
+          <div class="la-statvalue" id="stat-rate">—</div>
+        </div>
+        <div class="la-statcell">
+          <div class="la-statlabel" id="stat-angsuran-label">Angsuran / Bln</div>
+          <div class="la-statvalue" id="stat-angsuran">—</div>
+        </div>
+        <div class="la-statcell">
+          <div class="la-statlabel">Total Bunga</div>
+          <div class="la-statvalue" id="stat-bunga">—</div>
+        </div>
+        <div class="la-statcell">
+          <div class="la-statlabel">Estimasi Lunas</div>
+          <div class="la-statvalue" id="stat-lunas">—</div>
+        </div>
+      </div>
+
+      <!-- Table section header -->
+      <div class="la-section-header">
+        <div class="la-section-left">
+          <span class="la-section-title">Jadwal Angsuran Lengkap</span>
+          <span class="la-method-badge" id="method-badge">Anuitas</span>
+        </div>
+        <div class="la-section-right">
+          <span class="la-section-badge" id="badge-tenor">— bulan</span>
+          <button class="la-dl-btn" id="btn-download">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 12l-4-4h2.5V2h3v6H12L8 12z"/>
+              <path d="M2 13h12v1.5H2z"/>
+            </svg>
+            Unduh PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="la-table-wrap">
+        <table class="la-table">
+          <thead>
+            <tr>
+              <th>Bln</th>
+              <th>Saldo Awal</th>
+              <th>Bunga %</th>
+              <th>Bunga (IDR)</th>
+              <th>Pokok</th>
+              <th id="th-angsuran">Angsuran</th>
+              <th>Saldo Akhir</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3">Total</td>
+              <td id="tfoot-bunga" class="la-interest-val">—</td>
+              <td id="tfoot-pokok">—</td>
+              <td id="tfoot-total" class="la-angsuran-val">—</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Total summary block -->
+      <div class="la-tfoot-summary" id="tfoot-summary">
+        <div class="la-tfoot-cell">
+          <div class="la-tfoot-label">Total Bunga</div>
+          <div class="la-tfoot-value orange" id="tfoot2-bunga">—</div>
+        </div>
+        <div class="la-tfoot-cell">
+          <div class="la-tfoot-label">Total Pokok</div>
+          <div class="la-tfoot-value" id="tfoot2-pokok">—</div>
+        </div>
+        <div class="la-tfoot-cell">
+          <div class="la-tfoot-label">Total Pengembalian</div>
+          <div class="la-tfoot-value green" id="tfoot2-total">—</div>
+        </div>
+      </div>
+
+    </div><!-- /results -->
+  </div><!-- /la-right -->
+</div><!-- /la-page -->
+
+<!-- Watermark -->
+<div class="la-watermark">
+  Made with ♥ by <a href="https://instagram.com/vibe.withgede" target="_blank">@vibe.withgede</a>
+  &nbsp;·&nbsp; &copy; <span id="wm-year"></span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CALCULATION ENGINE
+// ═══════════════════════════════════════════════
+
+function formatPct(v) { return String(v).replace(".", ","); }
+
+function formatIDR(v) {
+  if (v === null || v === undefined || isNaN(v)) return "—";
+  const fixed = v.toFixed(2);
+  const [intPart, decPart] = fixed.split(".");
+  return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "," + decPart;
+}
+
+// ── ANUITAS ──────────────────────────────────
+// Fixed total payment every month.
+// Interest = balance × r (declines as balance falls)
+// Principal = payment - interest (grows each month)
+function generateAnuitas(loan, tenor, rate) {
+  const r = rate / 100;
+  const fixedPayment = r === 0
+    ? loan / tenor
+    : (loan * r) / (1 - Math.pow(1 + r, -tenor));
+
+  const rows = [];
+  let balance = loan, totalInterest = 0, totalPrincipal = 0;
+
+  for (let m = 1; m <= tenor; m++) {
+    const startBalance    = balance;
+    const interestPayment = startBalance * r;
+    let   principalPayment = fixedPayment - interestPayment;
+    if (m === tenor) principalPayment = balance; // absorb rounding
+    const endBalance = Math.max(startBalance - principalPayment, 0);
+    totalInterest  += interestPayment;
+    totalPrincipal += principalPayment;
+    balance = endBalance;
+    rows.push({
+      month: m, startBalance, ratePercent: rate,
+      interestPayment, principalPayment,
+      angsuran: m < tenor ? fixedPayment : principalPayment + interestPayment,
+      endBalance
+    });
+  }
+  return {
+    rows, totalInterest, totalPrincipal,
+    totalRepayment: loan + totalInterest,
+    fixedPayment,
+    angsuranVaries: false
+  };
+}
+
+// ── EFEKTIF ──────────────────────────────────
+// Principal = loan / tenor (uniform every month)
+// Interest  = remaining balance × r (declines each month)
+// Total angsuran = principal + interest → VARIES (decreasing)
+function generateEfektif(loan, tenor, rate) {
+  const r = rate / 100;
+  const principalPerMonth = loan / tenor;
+
+  const rows = [];
+  let balance = loan, totalInterest = 0, totalPrincipal = 0;
+
+  for (let m = 1; m <= tenor; m++) {
+    const startBalance     = balance;
+    const interestPayment  = startBalance * r;
+    const principalPayment = m === tenor ? balance : principalPerMonth;
+    const angsuran         = principalPayment + interestPayment;
+    const endBalance       = Math.max(startBalance - principalPayment, 0);
+    totalInterest  += interestPayment;
+    totalPrincipal += principalPayment;
+    balance = endBalance;
+    rows.push({
+      month: m, startBalance, ratePercent: rate,
+      interestPayment, principalPayment, angsuran, endBalance
+    });
+  }
+  return {
+    rows, totalInterest, totalPrincipal,
+    totalRepayment: loan + totalInterest,
+    fixedPayment: rows[0].angsuran, // first (highest) angsuran shown in summary
+    angsuranVaries: true
+  };
+}
+
+// ── FLAT ─────────────────────────────────────
+// Principal = loan / tenor (uniform)
+// Interest  = loan × r (calculated on ORIGINAL principal, never changes)
+// Total angsuran = principal + interest → FIXED every month
+function generateFlat(loan, tenor, rate) {
+  const r = rate / 100;
+  const principalPerMonth = loan / tenor;
+  const interestPerMonth  = loan * r;        // always on original loan
+  const fixedPayment      = principalPerMonth + interestPerMonth;
+
+  const rows = [];
+  let balance = loan, totalInterest = 0, totalPrincipal = 0;
+
+  for (let m = 1; m <= tenor; m++) {
+    const startBalance     = balance;
+    const principalPayment = m === tenor ? balance : principalPerMonth;
+    const endBalance       = Math.max(startBalance - principalPayment, 0);
+    totalInterest  += interestPerMonth;
+    totalPrincipal += principalPayment;
+    balance = endBalance;
+    rows.push({
+      month: m, startBalance, ratePercent: rate,
+      interestPayment: interestPerMonth,
+      principalPayment,
+      angsuran: fixedPayment,
+      endBalance
+    });
+  }
+  return {
+    rows, totalInterest, totalPrincipal,
+    totalRepayment: loan + totalInterest,
+    fixedPayment,
+    angsuranVaries: false
+  };
+}
+
+function validate(loan, tenor, rate) {
+  const errors = [];
+  if (!loan || loan <= 0)                    errors.push("Jumlah pinjaman harus lebih dari 0.");
+  if (!tenor || tenor <= 0 || !Number.isInteger(tenor)) errors.push("Tenor harus bilangan bulat positif.");
+  if (tenor > 360)                           errors.push("Tenor maksimum 360 bulan.");
+  if (rate <= 0)                             errors.push("Suku bunga harus lebih dari 0%.");
+  if (rate > 100)                            errors.push("Suku bunga terlalu tinggi (maks 100%).");
+  return errors;
+}
+
+function payoffDate(tenor) {
+  if (!tenor) return "—";
+  const d = new Date();
+  d.setMonth(d.getMonth() + tenor);
+  return d.toLocaleDateString("id-ID", { month: "short", year: "numeric" });
+}
+
+const METHOD_INFO = {
+  anuitas: "Angsuran total sama setiap bulan. Porsi bunga menurun, porsi pokok meningkat seiring saldo berkurang.",
+  efektif: "Angsuran pokok sama setiap bulan. Bunga dihitung dari saldo tersisa, sehingga total angsuran menurun setiap bulan.",
+  flat:    "Bunga dihitung dari pokok awal (bukan saldo), sehingga bunga dan angsuran total sama setiap bulan (metode sederhana)."
+};
+
+const METHOD_LABELS = {
+  anuitas: "Anuitas",
+  efektif: "Efektif",
+  flat:    "Flat"
+};
+
+const METHOD_BADGE_CLASS = {
+  anuitas: "badge-anuitas",
+  efektif: "badge-efektif",
+  flat:    "badge-flat"
+};
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let currentSchedule = null;
+let currentLoan = 0, currentTenor = 0, currentRate = 0, currentMethod = "anuitas";
+
+// ═══════════════════════════════════════════════
+// DOM REFS
+// ═══════════════════════════════════════════════
+const inpLoan   = document.getElementById("inp-loan");
+const inpRate   = document.getElementById("inp-rate");
+const inpTenor  = document.getElementById("inp-tenor");
+const inpMethod = document.getElementById("inp-method");
+const errBanner = document.getElementById("error-banner");
+const leftSum   = document.getElementById("left-summary");
+const emptyEl   = document.getElementById("empty-state");
+const resultsEl = document.getElementById("results");
+
+// ═══════════════════════════════════════════════
+// EVENT LISTENERS
+// ═══════════════════════════════════════════════
+inpLoan.addEventListener("input", () => {
+  const raw = inpLoan.value.replace(/\./g, "").replace(/[^0-9]/g, "");
+  inpLoan.value = raw ? parseInt(raw, 10).toLocaleString("id-ID") : "";
+  recalc();
+});
+inpRate.addEventListener("input", () => {
+  let v = inpRate.value.replace(/[^0-9,]/g, "");
+  const parts = v.split(",");
+  if (parts.length > 2) v = parts[0] + "," + parts.slice(1).join("");
+  inpRate.value = v;
+  recalc();
+});
+inpTenor.addEventListener("input", recalc);
+inpMethod.addEventListener("change", () => {
+  document.getElementById("method-info").textContent = METHOD_INFO[inpMethod.value];
+  recalc();
+});
+
+// ═══════════════════════════════════════════════
+// RECALCULATE & RENDER
+// ═══════════════════════════════════════════════
+function recalc() {
+  // If no fields have been filled yet, show a clean empty state with no errors
+  if (!inpLoan.value && !inpRate.value && !inpTenor.value) {
+    errBanner.classList.add("hidden");
+    emptyEl.classList.remove("hidden");
+    resultsEl.classList.add("hidden");
+    leftSum.classList.add("hidden");
+    currentSchedule = null;
+    return;
+  }
+
+  const loan   = parseFloat(inpLoan.value.replace(/\./g, "")) || 0;
+  const tenor  = parseInt(inpTenor.value) || 0;
+  const rate   = parseFloat(inpRate.value.replace(",", ".")) || 0;
+  const method = inpMethod.value;
+
+  currentLoan = loan; currentTenor = tenor;
+  currentRate = rate; currentMethod = method;
+
+  const errors = validate(loan, tenor, rate);
+
+  if (errors.length > 0) {
+    errBanner.innerHTML = errors.map(e => `⚠ ${e}`).join("<br>");
+    errBanner.classList.remove("hidden");
+    emptyEl.classList.remove("hidden");
+    resultsEl.classList.add("hidden");
+    leftSum.classList.add("hidden");
+    currentSchedule = null;
+    return;
+  }
+  errBanner.classList.add("hidden");
+
+  // Generate schedule based on selected method
+  const schedule = method === "efektif" ? generateEfektif(loan, tenor, rate)
+                 : method === "flat"    ? generateFlat(loan, tenor, rate)
+                 :                        generateAnuitas(loan, tenor, rate);
+  currentSchedule = schedule;
+
+  const principalPct = (schedule.totalPrincipal / schedule.totalRepayment) * 100;
+  const interestPct  = 100 - principalPct;
+  const lunas        = payoffDate(tenor);
+
+  // ── LEFT MINI STATS ──
+  const angsuranLabel = schedule.angsuranVaries ? "Angsuran Bln 1 (tertinggi)" : "Angsuran Tetap / Bulan";
+  document.getElementById("mini-angsuran-label").textContent = angsuranLabel;
+  document.getElementById("mini-angsuran").textContent = `Rp ${formatIDR(schedule.fixedPayment)}`;
+  document.getElementById("mini-bunga").textContent    = `Rp ${formatIDR(schedule.totalInterest)}`;
+  document.getElementById("mini-total").textContent    = `Rp ${formatIDR(schedule.totalRepayment)}`;
+  document.getElementById("mini-lunas").textContent    = lunas;
+  leftSum.classList.remove("hidden");
+
+  // ── HERO ──
+  document.getElementById("hero-num").textContent = `Rp ${formatIDR(schedule.totalRepayment)}`;
+
+  // ── BAR ──
+  document.getElementById("bar-fill").style.width        = `${principalPct.toFixed(1)}%`;
+  document.getElementById("bar-lbl-pokok").textContent   = `Pokok — ${principalPct.toFixed(2).replace(".", ",")}%`;
+  document.getElementById("bar-lbl-bunga").textContent   = `Bunga — ${interestPct.toFixed(2).replace(".", ",")}%`;
+
+  // ── STAT GRID ──
+  const statAngsuranLabel = schedule.angsuranVaries ? "Angsuran Bln 1" : "Angsuran / Bln";
+  document.getElementById("stat-angsuran-label").textContent = statAngsuranLabel;
+  document.getElementById("stat-rate").textContent     = `${formatPct(rate)}%`;
+  document.getElementById("stat-angsuran").textContent = `Rp ${formatIDR(schedule.fixedPayment)}`;
+  document.getElementById("stat-bunga").textContent    = `Rp ${formatIDR(schedule.totalInterest)}`;
+  document.getElementById("stat-lunas").textContent    = lunas;
+
+  // ── METHOD BADGE ──
+  const badge = document.getElementById("method-badge");
+  badge.textContent  = METHOD_LABELS[method];
+  badge.className    = `la-method-badge ${METHOD_BADGE_CLASS[method]}`;
+
+  // ── TABLE HEADER ──
+  document.getElementById("badge-tenor").textContent = `${tenor} bulan`;
+  const thAngsuran = document.getElementById("th-angsuran");
+  thAngsuran.innerHTML = schedule.angsuranVaries
+    ? `Angsuran <span class="la-varies-note">(bervariasi)</span>`
+    : `Angsuran`;
+
+  // ── TABLE BODY ──
+  const tbody = document.getElementById("table-body");
+  tbody.innerHTML = schedule.rows.map((row, i) => {
+    const isLast = i === schedule.rows.length - 1;
+    return `
+      <tr${isLast ? ' class="la-last"' : ''}>
+        <td><span class="la-month-badge">${row.month}</span></td>
+        <td>${formatIDR(row.startBalance)}</td>
+        <td><span class="la-rate-pill">${formatPct(row.ratePercent)}%</span></td>
+        <td class="la-interest-val">${formatIDR(row.interestPayment)}</td>
+        <td>${formatIDR(row.principalPayment)}</td>
+        <td class="la-angsuran-val">${formatIDR(row.angsuran)}</td>
+        <td>${isLast ? '<span class="la-zero">✓ 0</span>' : formatIDR(row.endBalance)}</td>
+      </tr>`;
+  }).join("");
+
+  // ── TFOOT SUMMARY ──
+  document.getElementById("tfoot2-bunga").textContent = `Rp ${formatIDR(schedule.totalInterest)}`;
+  document.getElementById("tfoot2-pokok").textContent = `Rp ${formatIDR(schedule.totalPrincipal)}`;
+  document.getElementById("tfoot2-total").textContent = `Rp ${formatIDR(schedule.totalRepayment)}`;
+
+  // ── SHOW RESULTS ──
+  emptyEl.classList.add("hidden");
+  resultsEl.classList.remove("hidden");
+}
+
+// ═══════════════════════════════════════════════
+// PDF DOWNLOAD
+// ═══════════════════════════════════════════════
+document.getElementById("btn-download").addEventListener("click", () => {
+  if (!currentSchedule) return;
+
+  const schedule = currentSchedule;
+  const loan     = currentLoan;
+  const tenor    = currentTenor;
+  const rate     = currentRate;
+  const method   = currentMethod;
+
+  const idr   = (v) => { const f = v.toFixed(2); const [i,d] = f.split("."); return i.replace(/\B(?=(\d{3})+(?!\d))/g,".") + "," + d; };
+  const today = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+  const lunas = payoffDate(tenor);
+  const principalPct = ((loan / schedule.totalRepayment) * 100).toFixed(1);
+  const interestPct  = (100 - parseFloat(principalPct)).toFixed(1);
+  const methodLabel  = METHOD_LABELS[method];
+  const angsuranNote = schedule.angsuranVaries ? "Angsuran Bln 1" : "Angsuran / Bulan";
+
+  const rowsHTML = schedule.rows.map((row, i) => {
+    const isLast = i === schedule.rows.length - 1;
+    const isEven = i % 2 === 0;
+    const bg = isLast ? "#ebf5ef" : isEven ? "#f5f5f2" : "#fff";
+    return `
+      <tr style="background:${bg}">
+        <td style="text-align:center;color:#2a7a50;font-weight:700">${row.month}</td>
+        <td style="color:#888">${idr(row.startBalance)}</td>
+        <td style="text-align:center">
+          <span style="background:#fef9ec;color:#b07d1a;border:1px solid #f0dfa0;border-radius:99px;padding:1px 7px;font-size:10px;font-weight:600">${formatPct(row.ratePercent)}%</span>
+        </td>
+        <td style="color:#b45a1e">${idr(row.interestPayment)}</td>
+        <td>${idr(row.principalPayment)}</td>
+        <td style="color:#2a7a50;font-weight:700">${idr(row.angsuran)}</td>
+        <td style="${isLast ? "color:#2a7a50;font-weight:700" : "color:#888"}">${isLast ? "✓ 0" : idr(row.endBalance)}</td>
+      </tr>`;
+  }).join("");
+
+  const year = new Date().getFullYear();
+
+  const html = `<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<title>Jadwal Angsuran — Kalkulator Kredit</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', Arial, sans-serif; color: #1c1c1c; background: #fff; font-size: 11px; }
+
+  /* ── TITLE BANNER ── */
+  .banner {
+    background: #fff;
+    padding: 28px 32px 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 2.5px solid #2a7a50;
+    padding-bottom: 18px;
+    margin-bottom: 20px;
+  }
+  .banner-left {}
+  .banner-eyebrow {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #2a7a50;
+    margin-bottom: 5px;
+  }
+  .banner-title {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 26px;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    color: #1c1c1c;
+    line-height: 1.1;
+  }
+  .banner-subtitle {
+    font-size: 10px;
+    color: #888;
+    margin-top: 5px;
+    font-weight: 400;
+  }
+  .banner-right {
+    text-align: right;
+  }
+  .banner-method {
+    display: inline-block;
+    background: #ebf5ef;
+    color: #2a7a50;
+    border: 1px solid #b5d9c5;
+    border-radius: 99px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    margin-bottom: 6px;
+  }
+  .banner-date {
+    font-size: 9px;
+    color: #aaa;
+    display: block;
+  }
+
+  /* ── SUMMARY ── */
+  .summary { margin: 0 32px 16px; background: #f9fdf9; border: 1px solid #c8e6d5; border-radius: 8px; padding: 14px 18px; }
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 0; }
+  .summary-label { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: #999; margin-bottom: 3px; }
+  .summary-val { font-size: 11.5px; font-weight: 700; color: #1c1c1c; line-height: 1.2; }
+  .summary-val.green { color: #2a7a50; }
+
+  /* ── BAR ── */
+  .bar-section { margin: 0 32px 16px; }
+  .bar-lbl { font-size: 8.5px; color: #999; display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .bar-track { height: 6px; background: #e8e8e2; border-radius: 99px; overflow: hidden; }
+  .bar-fill { height: 100%; background: #2a7a50; border-radius: 99px; width: ${principalPct}%; }
+
+  /* ── SECTION LABEL ── */
+  .section-label { margin: 0 32px 8px; display: flex; align-items: center; gap: 10px; }
+  .section-label-text { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #555; }
+  .section-label-line { flex: 1; height: 1px; background: #e0e0da; }
+
+  /* ── TABLE ── */
+  .table-wrap { margin: 0 32px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 9.5px; }
+  thead tr { background: #2a7a50; }
+  thead th { color: #fff; font-weight: 700; font-size: 8px; letter-spacing: 0.07em; text-transform: uppercase; padding: 6px 8px; text-align: right; }
+  thead th:first-child, thead th:nth-child(3) { text-align: center; }
+  tbody td { padding: 5px 8px; text-align: right; border-bottom: 1px solid #f0f0eb; }
+  tbody td:first-child, tbody td:nth-child(3) { text-align: center; }
+  tfoot { border-top: 2px solid #2a7a50; }
+  tfoot td { font-weight: 700; padding: 7px 8px; text-align: right; font-size: 9.5px; background: #f6f6f3; }
+  tfoot td:first-child { text-align: left; color: #999; font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; }
+
+  /* ── WATERMARK ── */
+  .watermark {
+    text-align: center;
+    padding: 18px 32px 12px;
+    font-size: 8.5px;
+    color: #bbb;
+    letter-spacing: 0.03em;
+    border-top: 1px solid #ececea;
+    margin-top: 16px;
+  }
+  .watermark-handle { color: #2a7a50; font-weight: 700; }
+  .watermark-dot { margin: 0 5px; color: #ddd; }
+
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    @page { margin: 12mm 10mm; size: A4; }
+    tbody tr { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TITLE BANNER -->
+<div class="banner">
+  <div class="banner-left">
+    <div class="banner-eyebrow">Dokumen Resmi</div>
+    <div class="banner-title">Kalkulator Kredit<br>Angsuran</div>
+    <div class="banner-subtitle">Jadwal angsuran lengkap berdasarkan metode ${methodLabel}</div>
+  </div>
+  <div class="banner-right">
+    <span class="banner-method">Metode ${methodLabel}</span>
+    <span class="banner-date">Diterbitkan: ${today}</span>
+  </div>
+</div>
+
+<!-- SUMMARY -->
+<div class="summary">
+  <div class="summary-grid">
+    <div><div class="summary-label">Jumlah Pinjaman</div><div class="summary-val">${idr(loan)}</div></div>
+    <div><div class="summary-label">Tenor</div><div class="summary-val">${tenor} Bulan</div></div>
+    <div><div class="summary-label">Suku Bunga / Bln</div><div class="summary-val">${formatPct(rate)}%</div></div>
+    <div><div class="summary-label">${angsuranNote}</div><div class="summary-val green">${idr(schedule.fixedPayment)}</div></div>
+    <div><div class="summary-label">Total Bunga</div><div class="summary-val">${idr(schedule.totalInterest)}</div></div>
+    <div><div class="summary-label">Total Pengembalian</div><div class="summary-val">${idr(schedule.totalRepayment)}</div></div>
+    <div><div class="summary-label">Estimasi Lunas</div><div class="summary-val">${lunas}</div></div>
+    <div><div class="summary-label">Pokok vs Bunga</div><div class="summary-val">${formatPct(principalPct)}% / ${formatPct(interestPct)}%</div></div>
+  </div>
+</div>
+
+<!-- PROGRESS BAR -->
+<div class="bar-section">
+  <div class="bar-lbl"><span>Pokok — ${formatPct(principalPct)}%</span><span>Bunga — ${formatPct(interestPct)}%</span></div>
+  <div class="bar-track"><div class="bar-fill"></div></div>
+</div>
+
+<!-- TABLE SECTION LABEL -->
+<div class="section-label">
+  <span class="section-label-text">Jadwal Angsuran Lengkap</span>
+  <span class="section-label-line"></span>
+</div>
+
+<!-- TABLE -->
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Bln</th><th>Saldo Awal</th><th>Bunga %</th>
+        <th>Bunga (IDR)</th><th>Pokok</th>
+        <th>${schedule.angsuranVaries ? "Angsuran (bervariasi)" : "Angsuran"}</th>
+        <th>Saldo Akhir</th>
+      </tr>
+    </thead>
+    <tbody>${rowsHTML}</tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3">Total</td>
+        <td style="color:#c0692a">${idr(schedule.totalInterest)}</td>
+        <td>${idr(schedule.totalPrincipal)}</td>
+        <td style="color:#2a7a50">${idr(schedule.totalRepayment)}</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+<!-- WATERMARK -->
+<div class="watermark">
+  Made with ♥ by
+  <span class="watermark-handle">@vibe.withgede</span>
+  <span class="watermark-dot">·</span>
+  &copy; ${year}
+  <span class="watermark-dot">·</span>
+  Kalkulator Kredit Angsuran
+</div>
+
+<script>
+  window.onload = function() {
+    window.print();
+    window.onafterprint = function() { window.close(); };
+  };
+<\/script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: "text/html" });
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, "_blank", "width=960,height=720");
+  if (!win) alert("Pop-up diblokir browser. Izinkan pop-up untuk mengunduh PDF.");
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+});
+
+// ═══════════════════════════════════════════════
+// INITIAL RENDER
+// ═══════════════════════════════════════════════
+document.getElementById("wm-year").textContent = new Date().getFullYear();
+recalc();
+</script>
+</body>
+</html>
